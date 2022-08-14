@@ -72,7 +72,7 @@ public class OrderBookEngine {
                 orderbookRepo.getAsks().remove(matchingAsk);
                 Trade trade = new Trade(matchingAsk.getPrice(), order.getQuantity(), matchingAsk.getCurrencyPair(), new Timestamp(System.currentTimeMillis()), Side.BUY);
                 tradesRepo.getTrades().add(trade);
-                matchingAsk.getQuantity().subtract(order.getQuantity());
+                matchingAsk.setQuantity(matchingAsk.getQuantity().subtract(order.getQuantity()));
                 orderbookRepo.addToAsks(matchingAsk);
                 order.setQuantity(BigDecimal.ZERO);
                 break;
@@ -108,12 +108,12 @@ public class OrderBookEngine {
                 tradesRepo.getTrades().add(trade);
                 BigDecimal orderQuantity = order.getQuantity();
                 order.setQuantity(orderQuantity.subtract(matchingBid.getQuantity()));
-            } else if (order.getQuantity().compareTo(matchingBid.getQuantity())< 0) {
+            } else if (order.getQuantity().compareTo(matchingBid.getQuantity()) < 0) {
                 /*sell order wants less quantity than the matched price ask - partial buyer fill*/
                 orderbookRepo.getBids().remove(matchingBid);
                 Trade trade = new Trade(matchingBid.getPrice(), order.getQuantity(), matchingBid.getCurrencyPair(), new Timestamp(System.currentTimeMillis()), Side.BUY);
                 tradesRepo.getTrades().add(trade);
-                matchingBid.getQuantity().subtract(order.getQuantity());
+                matchingBid.setQuantity(matchingBid.getQuantity().subtract(order.getQuantity()));
                 orderbookRepo.addToBids(matchingBid);
             } else {
                 /*the trading quantity for the buy and sell match exactly*/

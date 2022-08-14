@@ -63,4 +63,15 @@ public class Trade {
     public void setTakerSide(Side takerSide) {
         this.takerSide = takerSide;
     }
+
+    @Override
+    public String toString() {
+        return "Trade{" +
+                "price=" + price +
+                ", quantity=" + quantity +
+                ", currencyPair=" + currencyPair +
+                ", tradedAt=" + tradedAt +
+                ", takerSide=" + takerSide +
+                '}';
+    }
 }
