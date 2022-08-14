@@ -67,4 +67,15 @@ public class Order implements Serializable {
     public void setOrderPlaced(Timestamp orderPlaced) {
         this.orderPlaced = orderPlaced;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "side=" + side +
+                ", quantity=" + quantity +
+                ", price=" + price +
+                ", currencyPair=" + currencyPair +
+                ", orderPlaced=" + orderPlaced +
+                '}';
+    }
 }

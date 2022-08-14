@@ -1,0 +1,115 @@
+package com.test.orderbook.implementation;
+
+import com.test.orderbook.implementation.constants.CurrencyPair;
+import com.test.orderbook.implementation.constants.Side;
+import com.test.orderbook.implementation.dao.OrderbookDAO;
+import com.test.orderbook.implementation.dao.TradesDAO;
+import com.test.orderbook.implementation.domain.Order;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+@SpringBootTest
+public class OrderBookEngineTests {
+
+    @Test
+    public void testThatTheAddingSellsToAsksSortsTheListInAscendingOrderPriceAndAscendingTime(){
+        OrderbookDAO orderbookDAO = new OrderbookDAO();
+        Order order1 = new Order(Side.SELL, BigDecimal.valueOf(12.34345), BigDecimal.valueOf(1000), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:23"));
+        Order order2 = new Order(Side.SELL, BigDecimal.valueOf(12.34345), BigDecimal.valueOf(908), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:24"));
+        Order order3 = new Order(Side.SELL, BigDecimal.valueOf(3), BigDecimal.valueOf(1008), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:59:24"));
+        Order order4 = new Order(Side.SELL, BigDecimal.valueOf(3), BigDecimal.valueOf(1000), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:59:26"));
+
+        orderbookDAO.addToAsks(order1);
+        orderbookDAO.addToAsks(order2);
+        orderbookDAO.addToAsks(order3);
+        orderbookDAO.addToAsks(order4);
+
+        Assertions.assertEquals(orderbookDAO.getAsks().toString(),
+                "[Order{side=SELL, quantity=12.34345, price=908, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:55:24.0}, Order{side=SELL, quantity=12.34345, price=1000, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:55:23.0}, Order{side=SELL, quantity=3, price=1000, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:59:26.0}, Order{side=SELL, quantity=3, price=1008, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:59:24.0}]");
+    }
+
+    @Test
+    public void testThatAddingTheBuysToTheBidsListSortsInDescendingPriceAndAscendingTime(){
+        OrderbookDAO orderbookDAO = new OrderbookDAO();
+        Order order1 = new Order(Side.BUY, BigDecimal.valueOf(12.34345), BigDecimal.valueOf(1000), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:23"));
+        Order order2 = new Order(Side.BUY, BigDecimal.valueOf(12.34345), BigDecimal.valueOf(908), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:24"));
+        Order order3 = new Order(Side.BUY, BigDecimal.valueOf(3), BigDecimal.valueOf(1008), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:59:24"));
+        Order order4 = new Order(Side.BUY, BigDecimal.valueOf(3), BigDecimal.valueOf(1000), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:59:26"));
+
+        orderbookDAO.addToBids(order1);
+        orderbookDAO.addToBids(order2);
+        orderbookDAO.addToBids(order3);
+        orderbookDAO.addToBids(order4);
+
+        System.out.println(orderbookDAO.getBids());
+
+        Assertions.assertEquals(orderbookDAO.getBids().toString(),
+                "[Order{side=BUY, quantity=3, price=1008, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:59:24.0}, Order{side=BUY, quantity=12.34345, price=1000, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:55:23.0}, Order{side=BUY, quantity=3, price=1000, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:59:26.0}, Order{side=BUY, quantity=12.34345, price=908, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:55:24.0}]");
+    }
+
+    @Test
+    public void testAnIncomingBuyOrderDoesNotHaveAnyMatchingSellOrdersEmptyAsks(){
+        OrderbookDAO orderbookDAO = new OrderbookDAO();
+        TradesDAO tradesDAO = new TradesDAO();
+
+        OrderBookEngine orderBookEngine = new OrderBookEngine(orderbookDAO, tradesDAO);
+
+        Order order1 = new Order(Side.BUY, BigDecimal.valueOf(12.34345), BigDecimal.valueOf(1000), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:23"));
+        orderBookEngine.addBuyOrder(order1);
+
+        Assertions.assertTrue(orderBookEngine.getCurrentOrders().getAsks().isEmpty());
+        Assertions.assertFalse(orderBookEngine.getCurrentOrders().getBids().isEmpty());
+        Assertions.assertTrue(orderBookEngine.getExecutedTrades().getTrades().isEmpty());
+        Assertions.assertEquals(orderBookEngine.getCurrentOrders().getBids().toString(), "[Order{side=BUY, quantity=12.34345, price=1000, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:55:23.0}]");
+    }
+
+    @Test
+    public void testAnIncomingBuyOrderDoesNotHaveAnyMatchingSellOrdersFullAsksList(){
+        OrderbookDAO orderbookDAO = new OrderbookDAO();
+        TradesDAO tradesDAO = new TradesDAO();
+
+        OrderBookEngine orderBookEngine = new OrderBookEngine(orderbookDAO, tradesDAO);
+
+        Order order1 = new Order(Side.BUY, BigDecimal.valueOf(12.34345), BigDecimal.valueOf(1001), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:23"));
+        Order order2 = new Order(Side.BUY, BigDecimal.valueOf(12.34345), BigDecimal.valueOf(1002), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:23"));
+        Order order3 = new Order(Side.BUY, BigDecimal.valueOf(12.34345), BigDecimal.valueOf(1004), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:23"));
+        Order order4 = new Order(Side.BUY, BigDecimal.valueOf(12.34345), BigDecimal.valueOf(1004), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:23"));
+        Order order5 = new Order(Side.BUY, BigDecimal.valueOf(12.34345), BigDecimal.valueOf(1000.50), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:23"));
+
+
+        orderBookEngine.addSellOrder(order1);
+        orderBookEngine.addSellOrder(order2);
+        orderBookEngine.addSellOrder(order3);
+        orderBookEngine.addSellOrder(order4);
+        orderBookEngine.addSellOrder(order5);
+
+        Order order6 = new Order(Side.BUY, BigDecimal.valueOf(12.34345), BigDecimal.valueOf(1000), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:23"));
+        orderBookEngine.addBuyOrder(order6);
+
+        Assertions.assertEquals(orderBookEngine.getCurrentOrders().getAsks().size(), 5);
+        Assertions.assertEquals(orderBookEngine.getCurrentOrders().getBids().size(), 1);
+        Assertions.assertEquals(orderBookEngine.getExecutedTrades().getTrades().size(), 0);
+    }
+
+
+    private Timestamp getTimestampByString(String timestampString){
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        Date date = null;
+        try {
+            date = dateFormat.parse(timestampString);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        long time = date.getTime();
+        return new Timestamp(time);
+    }
+
+}
