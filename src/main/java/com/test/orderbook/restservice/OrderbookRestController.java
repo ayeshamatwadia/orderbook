@@ -42,18 +42,11 @@ public class OrderbookRestController {
     @PostMapping("/orders/limit")
     public ResponseEntity placeLimitOrder(@RequestBody Order limitOrder) {
         limitOrder.setOrderPlaced(new Timestamp(System.currentTimeMillis()));
-        if (limitOrder.getCurrencyPair().equals(CurrencyPair.BTCZAR)) {
-            if (limitOrder.getSide().equals(Side.BUY)) {
-                orderBookEngine.addBuyOrder(limitOrder);
-                return ResponseEntity.status(HttpStatus.CREATED).body("");
-            } else if (limitOrder.getSide().equals(Side.SELL)) {
-                orderBookEngine.addSellOrder(limitOrder);
-                return ResponseEntity.status(HttpStatus.CREATED).body("");
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Side is required to be BUY or SELL " + limitOrder.getSide());
-            }
+        if (limitOrder.getSide().equals(Side.BUY)){
+            orderBookEngine.addBuyOrder(limitOrder);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unsupported currency pair " + limitOrder.getCurrencyPair());
+            orderBookEngine.addSellOrder(limitOrder);
         }
+        return ResponseEntity.status(HttpStatus.CREATED).body("");
     }
 }
