@@ -185,6 +185,34 @@ public class OrderBookEngineTests {
         Assertions.assertEquals(orderBookEngine.getExecutedTrades().getTrades().get(2).getQuantity(), BigDecimal.valueOf(10));
     }
 
+    @Test
+    public void testPartialFillAcrossMultipleBuysFor1SellOrder(){
+        OrderbookDAO orderbookDAO = new OrderbookDAO();
+        TradesDAO tradesDAO = new TradesDAO();
+
+        OrderBookEngine orderBookEngine = new OrderBookEngine(orderbookDAO, tradesDAO);
+
+        Order order1 = new Order(Side.BUY, BigDecimal.valueOf(10), BigDecimal.valueOf(1010), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:52:23"));
+        Order order2 = new Order(Side.BUY, BigDecimal.valueOf(10), BigDecimal.valueOf(1003), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:23"));
+        Order order3 = new Order(Side.BUY, BigDecimal.valueOf(18), BigDecimal.valueOf(1015), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:58:23"));
+
+        orderBookEngine.addBuyOrder(order1);
+        orderBookEngine.addBuyOrder(order2);
+        orderBookEngine.addBuyOrder(order3);
+
+        Order order4 = new Order(Side.SELL, BigDecimal.valueOf(50), BigDecimal.valueOf(1002), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:59:23"));
+        orderBookEngine.addSellOrder(order4);
+
+        Assertions.assertEquals(orderBookEngine.getCurrentOrders().getBids().size(), 0);
+        Assertions.assertEquals(orderBookEngine.getCurrentOrders().getAsks().size(), 1);
+        Assertions.assertEquals(orderBookEngine.getTradesRepo().getTrades().size(), 3);
+
+        Assertions.assertEquals(orderBookEngine.getCurrentOrders().getAsks().toString(), "[Order{side=SELL, quantity=12, price=1002, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:59:23.0}]");
+        Assertions.assertEquals(orderBookEngine.getTradesRepo().getTrades().get(0).getPrice(), BigDecimal.valueOf(1015));
+        Assertions.assertEquals(orderBookEngine.getTradesRepo().getTrades().get(1).getPrice(), BigDecimal.valueOf(1010));
+        Assertions.assertEquals(orderBookEngine.getTradesRepo().getTrades().get(2).getPrice(), BigDecimal.valueOf(1003));
+    }
+
     private Timestamp getTimestampByString(String timestampString){
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         Date date = null;
