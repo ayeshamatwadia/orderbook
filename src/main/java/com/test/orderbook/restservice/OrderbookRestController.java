@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 @RestController
 public class OrderbookRestController {
@@ -25,7 +26,7 @@ public class OrderbookRestController {
 
     @GetMapping("/test")
     public Order test(){
-        return new Order(Side.BUY, BigDecimal.valueOf(12), BigDecimal.valueOf(1209), CurrencyPair.BTCZAR);
+        return new Order(Side.BUY, BigDecimal.valueOf(12), BigDecimal.valueOf(1209), CurrencyPair.BTCZAR, new Timestamp(System.currentTimeMillis()));
     }
 
     @GetMapping("/orderbook")
@@ -40,6 +41,7 @@ public class OrderbookRestController {
 
     @PostMapping("/orders/limit")
     public ResponseEntity placeLimitOrder(@RequestBody Order limitOrder) {
+        limitOrder.setOrderPlaced(new Timestamp(System.currentTimeMillis()));
         if (limitOrder.getCurrencyPair().equals(CurrencyPair.BTCZAR)) {
             if (limitOrder.getSide().equals(Side.BUY)) {
                 orderBookEngine.addBuyOrder(limitOrder);

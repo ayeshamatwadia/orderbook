@@ -13,6 +13,14 @@ public class Trade {
     private Timestamp tradedAt;
     private Side takerSide;
 
+    public Trade(BigDecimal price, BigDecimal quantity, CurrencyPair currencyPair, Timestamp tradedAt, Side takerSide) {
+        this.price = price;
+        this.quantity = quantity;
+        this.currencyPair = currencyPair;
+        this.tradedAt = tradedAt;
+        this.takerSide = takerSide;
+    }
+
     public Trade() {
     }
 

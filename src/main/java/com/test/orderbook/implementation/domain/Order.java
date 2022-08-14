@@ -6,6 +6,7 @@ import com.test.orderbook.implementation.constants.Side;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 public class Order implements Serializable {
     private Side side;
@@ -13,15 +14,18 @@ public class Order implements Serializable {
     private BigDecimal price;
     private CurrencyPair currencyPair;
 
+    private Timestamp orderPlaced;
+
     public Order() {
     }
 
     @JsonCreator
-    public Order(Side side, BigDecimal quantity, BigDecimal price, CurrencyPair currencyPair) {
+    public Order(Side side, BigDecimal quantity, BigDecimal price, CurrencyPair currencyPair, Timestamp orderPlaced) {
         this.side = side;
         this.quantity = quantity;
         this.price = price;
         this.currencyPair = currencyPair;
+        this.orderPlaced = orderPlaced;
     }
 
     public Side getSide() {
@@ -54,5 +58,13 @@ public class Order implements Serializable {
 
     public void setCurrencyPair(CurrencyPair currencyPair) {
         this.currencyPair = currencyPair;
+    }
+
+    public Timestamp getOrderPlaced() {
+        return orderPlaced;
+    }
+
+    public void setOrderPlaced(Timestamp orderPlaced) {
+        this.orderPlaced = orderPlaced;
     }
 }
