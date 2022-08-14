@@ -72,7 +72,7 @@ public class OrderBookEngine {
                 Trade trade = new Trade(matchingAsk.getPrice(), order.getQuantity(), matchingAsk.getCurrencyPair(), new Timestamp(System.currentTimeMillis()), Side.BUY);
                 tradesRepo.getTrades().add(trade);
                 matchingAsk.getQuantity().subtract(order.getQuantity());
-                orderbookRepo.getAsks().add(matchingAsk);
+                orderbookRepo.addToAsks(matchingAsk);
                 order.setQuantity(BigDecimal.ZERO);
                 break;
             } else {
@@ -85,11 +85,11 @@ public class OrderBookEngine {
         }
         /*If the current buy order has been partially filled or there were no matching asks then add it to the Bids list*/
         if(order.getQuantity().compareTo(BigDecimal.ZERO) > 0){
-            orderbookRepo.getBids().add(order);
+            orderbookRepo.addToBids(order);
         }
     }
 
-    public void addSellOrder(Order order){
+    public void addSellOrder(Order order) {
         List<Order> bids = orderbookRepo.getBids();
         List<Order> matchingBids = new ArrayList<>();
 
@@ -112,10 +112,10 @@ public class OrderBookEngine {
                 Trade trade = new Trade(matchingBid.getPrice(), order.getQuantity(), matchingBid.getCurrencyPair(), new Timestamp(System.currentTimeMillis()), Side.BUY);
                 tradesRepo.getTrades().add(trade);
                 matchingBid.getQuantity().subtract(order.getQuantity());
-                orderbookRepo.getBids().add(matchingBid);
+                orderbookRepo.addToBids(matchingBid);
             } else {
                 /*the trading quantity for the buy and sell match exactly*/
-               orderbookRepo.getBids().remove(matchingBid);
+                orderbookRepo.getBids().remove(matchingBid);
                 Trade trade = new Trade(matchingBid.getPrice(), matchingBid.getQuantity(), matchingBid.getCurrencyPair(), new Timestamp(System.currentTimeMillis()), Side.BUY);
                 tradesRepo.getTrades().add(trade);
                 order.getQuantity().subtract(matchingBid.getQuantity());
@@ -123,9 +123,9 @@ public class OrderBookEngine {
         }
         /*If the current sell order has been partially filled or there were no matching bids then add it to the Asks list*/
         if(order.getQuantity().compareTo(BigDecimal.ZERO) > 0){
-            orderbookRepo.getAsks().add(order);
+            orderbookRepo.addToAsks(order);
         }
-        
+
     }
 
     public OrderBookDTO getCurrentOrders() {
