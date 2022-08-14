@@ -1,4 +1,4 @@
-package com.test.orderbook.implementation;
+package com.test.orderbook.implementation.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.test.orderbook.implementation.constants.CurrencyPair;

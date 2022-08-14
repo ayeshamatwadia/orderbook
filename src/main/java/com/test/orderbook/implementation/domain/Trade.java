@@ -1,4 +1,7 @@
-package com.test.orderbook.implementation.constants;
+package com.test.orderbook.implementation.domain;
+
+import com.test.orderbook.implementation.constants.CurrencyPair;
+import com.test.orderbook.implementation.constants.Side;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
