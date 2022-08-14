@@ -213,6 +213,34 @@ public class OrderBookEngineTests {
         Assertions.assertEquals(orderBookEngine.getTradesRepo().getTrades().get(2).getPrice(), BigDecimal.valueOf(1003));
     }
 
+    @Test
+    public void testPartialFillOfABuyOrder(){
+        OrderbookDAO orderbookDAO = new OrderbookDAO();
+        TradesDAO tradesDAO = new TradesDAO();
+
+        OrderBookEngine orderBookEngine = new OrderBookEngine(orderbookDAO, tradesDAO);
+
+        Order order1 = new Order(Side.SELL, BigDecimal.valueOf(10), BigDecimal.valueOf(1010), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:52:23"));
+        Order order2 = new Order(Side.SELL, BigDecimal.valueOf(10), BigDecimal.valueOf(1003), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:55:23"));
+        Order order3 = new Order(Side.SELL, BigDecimal.valueOf(18), BigDecimal.valueOf(1015), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:58:23"));
+
+        orderBookEngine.addSellOrder(order1);
+        orderBookEngine.addSellOrder(order2);
+        orderBookEngine.addSellOrder(order3);
+
+        Order order5 = new Order(Side.BUY, BigDecimal.valueOf(50), BigDecimal.valueOf(1005), CurrencyPair.BTCZAR, getTimestampByString("14-08-2022 17:59:23"));
+        orderBookEngine.addBuyOrder(order5);
+
+        Assertions.assertEquals(orderBookEngine.getCurrentOrders().getBids().size(), 1);
+        Assertions.assertEquals(orderBookEngine.getCurrentOrders().getAsks().size(), 2);
+        Assertions.assertEquals(orderBookEngine.getTradesRepo().getTrades().size(), 1);
+
+        Assertions.assertEquals(orderBookEngine.getCurrentOrders().getAsks().toString(), "[Order{side=SELL, quantity=10, price=1010, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:52:23.0}, Order{side=SELL, quantity=18, price=1015, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:58:23.0}]");
+        Assertions.assertEquals(orderBookEngine.getCurrentOrders().getBids().toString(), "[Order{side=BUY, quantity=40, price=1005, currencyPair=BTCZAR, orderPlaced=2022-08-14 17:59:23.0}]");
+        Assertions.assertEquals(orderBookEngine.getTradesRepo().getTrades().get(0).getPrice(), BigDecimal.valueOf(1003));
+        Assertions.assertEquals(orderBookEngine.getTradesRepo().getTrades().get(0).getQuantity(), BigDecimal.valueOf(10));
+    }
+
     private Timestamp getTimestampByString(String timestampString){
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         Date date = null;
