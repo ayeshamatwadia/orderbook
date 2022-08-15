@@ -8,7 +8,8 @@ During my research I came across many matching algorithms used on trading apps:
 3. LMM - Lead Market Makers - Prioritize the Market makers for a given price
 etc
 
-My service has 3 endpoints:
+My service has 3 endpoints: Which can be imported into POSTMAN using the
+'Orderbook Collection.postman_collection.json' in the resources folder
 
 http://localhost:8080/orderbook
 Gets the orderbook (Can be a public API and does not require any authorization)
@@ -23,7 +24,7 @@ POST: http://localhost:8080/orders/limit
     "price": 1210,
     "currencyPair": "BTCZAR"
 }
-(Todo: This would ordinarily a protected API)
+(This has some basic authentication with an API key)
 
 todo: look into the current data structures used for the Asks and Bids List
 I am currently using an ArrayList, which I do not think is the best structure

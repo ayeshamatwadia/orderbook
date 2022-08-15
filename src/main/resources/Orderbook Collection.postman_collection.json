@@ -1,0 +1,58 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Orderbook Collection",
+		"_postman_id": "5de92c65-ce26-74b5-d827-93cadfd9e0cb",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Orderbook",
+			"request": {
+				"url": "http://localhost:8080/orderbook",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Get the current Asks and Bids for a given instrument"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Trades",
+			"request": {
+				"url": "http://localhost:8080/trades",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Get the executed Trades\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Post Limit Order",
+			"request": {
+				"url": "http://localhost:8080/orders/limit",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "MY-API-KEY",
+						"value": "special-api-key",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"side\": \"BUY\",\n    \"quantity\": 10,\n    \"price\": 100,\n    \"currencyPair\": \"BTCZAR\"\n}"
+				},
+				"description": "Post a Limit Order to the orderbook"
+			},
+			"response": []
+		}
+	]
+}
