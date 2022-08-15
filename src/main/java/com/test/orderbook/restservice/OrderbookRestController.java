@@ -1,5 +1,6 @@
 package com.test.orderbook.restservice;
 
+import com.test.orderbook.implementation.BinaryTreeOrderBookEngine;
 import com.test.orderbook.implementation.domain.Order;
 import com.test.orderbook.implementation.OrderBookEngine;
 import com.test.orderbook.implementation.constants.CurrencyPair;
@@ -17,10 +18,13 @@ import java.sql.Timestamp;
 @RestController
 public class OrderbookRestController {
 
+    private boolean useBinaryTreeImplementation;
     private OrderBookEngine orderBookEngine;
 
+    private BinaryTreeOrderBookEngine binaryTreeOrderBookEngine;
+
     @Autowired
-    public OrderbookRestController(OrderBookEngine orderBook) {
+    public OrderbookRestController(OrderBookEngine orderBook, BinaryTreeOrderBookEngine binaryTreeOrderBookEngine) {
         this.orderBookEngine = orderBook;
     }
 
@@ -31,21 +35,37 @@ public class OrderbookRestController {
 
     @GetMapping("/orderbook")
     public OrderBookDTO getOrders() {
-        return orderBookEngine.getCurrentOrders();
+        if(useBinaryTreeImplementation){
+            return binaryTreeOrderBookEngine.getCurrentOrders();
+        }else{
+            return orderBookEngine.getCurrentOrders();
+        }
     }
 
     @GetMapping("/trades")
     public TradesDTO getTrades() {
-        return orderBookEngine.getExecutedTrades();
+        if(useBinaryTreeImplementation){
+            return binaryTreeOrderBookEngine.getExecutedTrades();
+        } else{
+            return orderBookEngine.getExecutedTrades();
+        }
     }
 
     @PostMapping("/orders/limit")
     public ResponseEntity placeLimitOrder(@RequestBody Order limitOrder) {
         limitOrder.setOrderPlaced(new Timestamp(System.currentTimeMillis()));
         if (limitOrder.getSide().equals(Side.BUY)){
-            orderBookEngine.addBuyOrder(limitOrder);
+            if(useBinaryTreeImplementation){
+                binaryTreeOrderBookEngine.addBuyOrder(limitOrder);
+            }else {
+                orderBookEngine.addBuyOrder(limitOrder);
+            }
         } else {
-            orderBookEngine.addSellOrder(limitOrder);
+            if(useBinaryTreeImplementation){
+                binaryTreeOrderBookEngine.addSellOrder(limitOrder);
+            }else {
+                orderBookEngine.addSellOrder(limitOrder);
+            }
         }
         return ResponseEntity.status(HttpStatus.CREATED).body("");
     }

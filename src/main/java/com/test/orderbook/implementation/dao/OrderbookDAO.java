@@ -1,6 +1,7 @@
 package com.test.orderbook.implementation.dao;
 
 import com.test.orderbook.implementation.domain.Order;
+import com.test.orderbook.implementation.tree.BinarySearchTree;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;

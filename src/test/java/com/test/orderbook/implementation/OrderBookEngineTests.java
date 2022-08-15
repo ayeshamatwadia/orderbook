@@ -241,7 +241,7 @@ public class OrderBookEngineTests {
         Assertions.assertEquals(orderBookEngine.getTradesRepo().getTrades().get(0).getQuantity(), BigDecimal.valueOf(10));
     }
 
-    private Timestamp getTimestampByString(String timestampString){
+    public Timestamp getTimestampByString(String timestampString){
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         Date date = null;
         try {

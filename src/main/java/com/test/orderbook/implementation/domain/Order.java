@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
-public class Order implements Serializable {
+public class Order implements Serializable, Comparable<Order> {
     private Side side;
     private BigDecimal quantity;
     private BigDecimal price;
@@ -77,5 +77,14 @@ public class Order implements Serializable {
                 ", currencyPair=" + currencyPair +
                 ", orderPlaced=" + orderPlaced +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Order o) {
+        Integer i = this.getPrice().compareTo(o.getPrice());
+        if(i.equals(0)){
+            return this.getOrderPlaced().compareTo(o.getOrderPlaced());
+        }
+        return i;
     }
 }
