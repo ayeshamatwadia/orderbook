@@ -52,10 +52,17 @@ public class OrderBookEngine {
         List<Order> asks = orderbookRepo.getAsks();
         List<Order> matchingAsks = new ArrayList<>();
 
+        BigDecimal currentOrderQuantity = order.getQuantity();
         /*here we are getting all the asks (seller orders that are less than or equal to the buyers price)*/
         for (Order ask : asks) {
-            if(order.getPrice().compareTo(ask.getPrice()) >= 0) {
-                 matchingAsks.add(ask);
+            if(currentOrderQuantity.compareTo(BigDecimal.ZERO) <=0){
+                /*exit the loop if we have enough ask-quantity to fullfil the current order - we only need x asks, not all the asks*/
+                break;
+            }else {
+                if(order.getPrice().compareTo(ask.getPrice()) >= 0) {
+                    matchingAsks.add(ask);
+                    currentOrderQuantity.subtract(ask.getQuantity());
+                }
             }
         }
 
@@ -94,10 +101,16 @@ public class OrderBookEngine {
         List<Order> bids = orderbookRepo.getBids();
         List<Order> matchingBids = new ArrayList<>();
 
+        BigDecimal currentOrderQuantity = order.getQuantity();
         /*here we are getting all the bids (buyers that are greater than or equal to the sellers price)*/
         for (Order bid : bids) {
+            if(currentOrderQuantity.compareTo(BigDecimal.ZERO) <= 0){
+                /*exit the loop if we have enough bid-quantity to fullfil the current order - we only need x bids, not all the bids*/
+                break;
+            }
             if(order.getPrice().compareTo(bid.getPrice()) <= 0){
                matchingBids.add(bid);
+               currentOrderQuantity.subtract(bid.getQuantity());
             }
         }
         for (Order matchingBid : matchingBids) {
