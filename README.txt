@@ -26,10 +26,3 @@ POST: http://localhost:8080/orders/limit
 }
 (This has some basic authentication with an API key)
 
-todo: look into the current data structures used for the Asks and Bids List
-I am currently using an ArrayList, which I do not think is the best structure
-for the problem at hand but I chose to get started. I have looked at perhaps a
-TreeMap data type for the Asks and Bids list as it is a sorted datastructure
-
-todo: consider adding a customerId and an id to the orders that can make cancelling or looking up
-existing orders easier.
